@@ -9,7 +9,10 @@ class Token {
     @Column("varchar", { length: 255 })
     ip_address: string;
 
-    @ManyToOne(() => User, (user) => user.tokens)
+    @ManyToOne(() => User, (user) => user.tokens, {
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+    })
     user: User;
 
     @Column("text")

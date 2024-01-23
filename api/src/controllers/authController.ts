@@ -5,7 +5,6 @@ import Hasher from "../helpers/hasher";
 import WebToken from "../helpers/webToken";
 import apiResponse from "../helpers/apiResponse";
 import authService from "../services/authService";
-import requestIP from "request-ip";
 
 class AuthController {
     async register(req: Request<{}, {}, IRegisterDTO>, res: Response) {
@@ -30,7 +29,7 @@ class AuthController {
 
             const hashedRefreshToken = Hasher.hash(refreshToken);
 
-            const ip = requestIP.getClientIp(req) as string;
+            const ip = req.ip || (req.socket.remoteAddress as string);
 
             await authService.saveToken(hashedRefreshToken, newUser, ip);
 
