@@ -1,13 +1,13 @@
 import { Router } from "express";
-import AuthController from "../controllers/authController";
 import authGuard from "../middlewares/authGuard";
+import authController from "../controllers/authController";
 
 const authRoute = Router();
 
-authRoute.post("/register", AuthController.register);
-authRoute.post("/login", AuthController.login);
-authRoute.post("/refresh", AuthController.refresh);
-authRoute.post("/logout", authGuard, AuthController.logout);
-authRoute.get("/me", AuthController.me);
+authRoute.post("/register", authController.register);
+authRoute.post("/login", authController.login);
+authRoute.post("/refresh", authController.refresh);
+authRoute.post("/logout", authGuard, authController.logout);
+authRoute.get("/me", authController.me);
 
 export default authRoute;

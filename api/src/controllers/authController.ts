@@ -1,48 +1,54 @@
 import { Request, Response } from "express";
-import db from "../config/db.config";
-import { User } from "../entities/User.entity";
-import { BadRequest } from "../helpers/error";
+import { BadRequest, HTTPError } from "../helpers/error";
+import { IRegisterDTO, IUserPayload, roleType } from "../types";
 import Hasher from "../helpers/hasher";
-
-interface IRegisterDTO {
-    name: string;
-    email: string;
-    password: string;
-}
+import WebToken from "../helpers/webToken";
+import apiResponse from "../helpers/apiResponse";
+import authService from "../services/authService";
+import requestIP from "request-ip";
 
 class AuthController {
-    private static async getUser(email: string) {
-        const userRepo = db.getRepository(User);
-        const user = await userRepo.findOne({ where: { email } });
+    async register(req: Request<{}, {}, IRegisterDTO>, res: Response) {
+        try {
+            const { body } = req;
 
-        return user;
-    }
+            const isUserExist = await authService.getUser(body.email);
 
-    private static async saveUser(userInfo: IRegisterDTO) {
-        const userRepo = db.getRepository(User);
+            if (isUserExist) {
+                throw new BadRequest("User already exists");
+            }
 
-        const newUser = new User();
-        newUser.email = userInfo.email;
-        newUser.name = userInfo.name;
-        newUser.password = Hasher.hash(userInfo.password);
+            const newUser = await authService.saveUser(body);
 
-        await userRepo.save(newUser);
-    }
+            const payload: IUserPayload = {
+                id: newUser.id,
+                role: newUser.role as roleType,
+            };
 
-    static async register(req: Request<{}, {}, IRegisterDTO>, res: Response) {
-        const { name, email, password } = req.body;
+            const accessToken = WebToken.generateAccess(payload);
+            const refreshToken = WebToken.generateRefresh(payload);
 
-        const isUserExist = await this.getUser(email);
+            const hashedRefreshToken = Hasher.hash(refreshToken);
 
-        if (isUserExist) {
-            throw new BadRequest("User already exists");
+            const ip = requestIP.getClientIp(req) as string;
+
+            await authService.saveToken(hashedRefreshToken, newUser, ip);
+
+            apiResponse(res, { accessToken, refreshToken }, 201);
+        } catch (error) {
+            console.log(error);
+            if (error instanceof HTTPError) {
+                apiResponse(res, error);
+            } else {
+                apiResponse(res, new HTTPError("Internal Server Error", 500));
+            }
         }
     }
 
-    static async login(req: Request, res: Response) {}
-    static async refresh(req: Request, res: Response) {}
-    static async logout(req: Request, res: Response) {}
-    static async me(req: Request, res: Response) {}
+    async login(req: Request, res: Response) {}
+    async refresh(req: Request, res: Response) {}
+    async logout(req: Request, res: Response) {}
+    async me(req: Request, res: Response) {}
 }
 
-export default AuthController;
+export default new AuthController();

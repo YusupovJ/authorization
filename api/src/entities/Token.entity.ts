@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./User.entity";
+import User from "./User.entity";
 
 @Entity()
-export class Token {
+class Token {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -12,9 +12,14 @@ export class Token {
     @ManyToOne(() => User, (user) => user.tokens)
     user: User;
 
+    @Column("text")
+    refresh_token: string;
+
     @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
     created_at: string;
 
     @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
     updated_at: string;
 }
+
+export default Token;

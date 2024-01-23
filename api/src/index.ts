@@ -1,12 +1,14 @@
+import "reflect-metadata";
 import express from "express";
 import env from "./config/env.config";
-import "reflect-metadata";
 import db from "./config/db.config";
+import authRoute from "./routes/authRoute";
 
 const app = express();
 const port = env.PORT;
 
 app.use(express.json());
+app.use("/auth", authRoute);
 
 const start = async () => {
     try {

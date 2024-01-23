@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import env from "./env.config";
-import { User } from "../entities/User.entity";
-import { Token } from "../entities/Token.entity";
+import User from "../entities/User.entity";
+import Token from "../entities/Token.entity";
 
 const db = new DataSource({
     type: "mysql",

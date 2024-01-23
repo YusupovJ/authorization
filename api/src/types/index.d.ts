@@ -7,8 +7,13 @@ declare global {
 }
 
 type roleType = "user" | "admin";
-
 interface IUserPayload {
     id: number;
     role: roleType;
+}
+
+interface IRegisterDTO {
+    name: string;
+    email: string;
+    password: string;
 }

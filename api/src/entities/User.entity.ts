@@ -1,8 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Token } from "./Token.entity";
+import Token from "./Token.entity";
 
 @Entity()
-export class User {
+class User {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -27,3 +27,5 @@ export class User {
     @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
     updated_at: string;
 }
+
+export default User;
