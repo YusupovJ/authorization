@@ -18,7 +18,7 @@ export class User {
     @Column("enum", { enum: ["user", "admin"] })
     role: string;
 
-    @OneToMany(() => Token, (token) => token.user)
+    @OneToMany(() => Token, (token) => token.user, { nullable: true })
     tokens: Token[];
 
     @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
