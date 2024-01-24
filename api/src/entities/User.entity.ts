@@ -1,5 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import Token from "./Token.entity";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 class User {
@@ -17,9 +16,6 @@ class User {
 
     @Column("enum", { enum: ["user", "admin"] })
     role: string;
-
-    @OneToMany(() => Token, (token) => token.user, { nullable: true })
-    tokens: Token[];
 
     @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
     created_at: string;

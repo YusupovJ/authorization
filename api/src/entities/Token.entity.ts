@@ -1,6 +1,5 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import User from "./User.entity";
-
 @Entity()
 class Token {
     @PrimaryGeneratedColumn()
@@ -9,14 +8,12 @@ class Token {
     @Column("varchar", { length: 255 })
     ip_address: string;
 
-    @ManyToOne(() => User, (user) => user.tokens, {
-        onDelete: "CASCADE",
-        onUpdate: "CASCADE",
-    })
-    user: User;
-
     @Column("text")
     refresh_token: string;
+
+    @ManyToMany(() => User)
+    @JoinTable()
+    users: User[];
 
     @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
     created_at: string;

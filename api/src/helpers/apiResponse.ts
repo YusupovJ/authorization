@@ -2,7 +2,7 @@ import { HTTPError } from "./error";
 import Pagination from "./pagination";
 import { Response } from "express";
 
-function apiResponse(res: Response, data: any, status: number, pagination?: Pagination): void;
+function apiResponse<T>(res: Response, data: T, status: number, pagination?: Pagination): void;
 function apiResponse(res: Response, error: HTTPError): void;
 function apiResponse(res: Response, response: any, status?: number, pagination?: Pagination) {
     if (response instanceof HTTPError) {

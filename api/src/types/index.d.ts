@@ -17,3 +17,8 @@ interface IRegisterDTO {
     email: string;
     password: string;
 }
+
+interface ILoginDTO {
+    email: string;
+    password: string;
+}
