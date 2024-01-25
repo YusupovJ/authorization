@@ -12,6 +12,11 @@ interface IUserPayload {
     role: roleType;
 }
 
+interface VerifyPayload extends IUserPayload {
+    iat: number;
+    exp: number;
+}
+
 interface IRegisterDTO {
     name: string;
     email: string;

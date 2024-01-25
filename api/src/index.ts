@@ -3,11 +3,13 @@ import express from "express";
 import env from "./config/env.config";
 import db from "./config/db.config";
 import authRoute from "./routes/authRoute";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const port = env.PORT;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/auth", authRoute);
 
 const start = async () => {

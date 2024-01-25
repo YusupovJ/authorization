@@ -2,7 +2,10 @@ import { ObjectLiteral, Repository } from "typeorm";
 import db from "../config/db.config";
 import User from "../entities/User.entity";
 import Hasher from "../helpers/hasher";
-import { IRegisterDTO } from "../types";
+import { IRegisterDTO, IUserPayload } from "../types";
+import WebToken from "../helpers/webToken";
+import getIP from "../helpers/getIP";
+import tokenService from "./tokenService";
 
 class AuthService {
     private userRepo: Repository<ObjectLiteral>;
@@ -13,6 +16,12 @@ class AuthService {
 
     async getUser(email: string) {
         const user = await this.userRepo.findOne({ where: { email } });
+
+        return user;
+    }
+
+    async getUserById(id: number) {
+        const user = await this.userRepo.findOne({ where: { id } });
 
         return user;
     }

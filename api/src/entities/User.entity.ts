@@ -14,7 +14,7 @@ class User {
     @Column("varchar", { length: 255 })
     password: string;
 
-    @Column("enum", { enum: ["user", "admin"] })
+    @Column("enum", { enum: ["user", "admin"], default: "user" })
     role: string;
 
     @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
