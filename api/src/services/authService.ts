@@ -2,10 +2,7 @@ import { ObjectLiteral, Repository } from "typeorm";
 import db from "../config/db.config";
 import User from "../entities/User.entity";
 import Hasher from "../helpers/hasher";
-import { IRegisterDTO, IUserPayload } from "../types";
-import WebToken from "../helpers/webToken";
-import getIP from "../helpers/getIP";
-import tokenService from "./tokenService";
+import { IRegisterDTO } from "../types";
 
 class AuthService {
     private userRepo: Repository<ObjectLiteral>;

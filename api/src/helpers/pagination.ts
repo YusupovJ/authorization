@@ -9,7 +9,7 @@ class Pagination {
         this.totalItems = totalItems;
         this.currentPage = page || 1;
         this.limit = limit || 15;
-        this.offset = (this.page - 1) * limit;
+        this.offset = (this.currentPage - 1) * limit;
         this.totalPages = Math.floor(this.totalItems / this.limit);
     }
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { BadRequest, NotFound } from "../helpers/error";
+import { BadRequest, NotFound, Unauthorized } from "../helpers/error";
 import { ILoginDTO, IRegisterDTO, IUserPayload, roleType } from "../types";
 import Hasher from "../helpers/hasher";
 import WebToken from "../helpers/webToken";
@@ -32,7 +32,10 @@ class AuthController {
             const accessToken = WebToken.generateAccess(payload);
             const refreshToken = WebToken.generateRefresh(payload);
 
-            res.cookie("refreshToken", refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            res.cookie("refreshToken", refreshToken, {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+            });
 
             const hashedRefreshToken = Hasher.hash(refreshToken);
 
@@ -70,7 +73,10 @@ class AuthController {
             const accessToken = WebToken.generateAccess(payload);
             const refreshToken = WebToken.generateRefresh(payload);
 
-            res.cookie("refreshToken", refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            res.cookie("refreshToken", refreshToken, {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+            });
 
             const ip = getIP(req);
             const hashedRefreshToken = Hasher.hash(refreshToken);
@@ -93,6 +99,10 @@ class AuthController {
         try {
             const { refreshToken } = req.cookies;
 
+            if (!refreshToken) {
+                throw new Unauthorized("You must be authorized");
+            }
+
             const ip = getIP(req);
 
             const payload = WebToken.verifyRefresh(refreshToken);
@@ -103,6 +113,11 @@ class AuthController {
             }
 
             const token = (await tokenService.getToken(user, ip)) as Token;
+
+            if (!token) {
+                throw new Unauthorized("You must be authorized");
+            }
+
             const isTokenRight = Hasher.compare(refreshToken, token.refresh_token);
 
             if (!isTokenRight) {
@@ -118,7 +133,10 @@ class AuthController {
                 role: payload.role,
             });
 
-            res.cookie("refreshToken", newRefreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            res.cookie("refreshToken", newRefreshToken, {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+            });
 
             const hashedRefreshToken = Hasher.hash(newRefreshToken);
 
@@ -135,9 +153,48 @@ class AuthController {
         }
     }
 
-    async logout(req: Request, res: Response) {}
+    async logout(req: Request, res: Response) {
+        try {
+            const { id } = req;
 
-    async me(req: Request, res: Response) {}
+            const user = (await authService.getUserById(id)) as User;
+
+            if (!user) {
+                throw new NotFound("User not found");
+            }
+
+            const ip = getIP(req);
+            const token = (await tokenService.getToken(user, ip)) as Token;
+
+            if (!token) {
+                throw new Unauthorized("You must be authorized");
+            }
+
+            await tokenService.deleteToken(token.id);
+
+            apiResponse(res, "You successfully logged out", 200);
+        } catch (error) {
+            handleError(res, error);
+        }
+    }
+
+    async me(req: Request, res: Response) {
+        try {
+            const { id } = req;
+
+            const user = (await authService.getUserById(id)) as User;
+
+            if (!user) {
+                throw new NotFound("User not found");
+            }
+
+            const { password, ...response } = user;
+
+            apiResponse(res, response, 200);
+        } catch (error) {
+            handleError(res, error);
+        }
+    }
 }
 
 export default new AuthController();

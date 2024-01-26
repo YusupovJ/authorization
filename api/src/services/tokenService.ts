@@ -40,6 +40,10 @@ class TokenService {
 
         await this.tokenRepo.update({ id }, updatedToken);
     }
+
+    async deleteToken(id: number) {
+        await this.tokenRepo.delete({ id });
+    }
 }
 
 export default new TokenService();
